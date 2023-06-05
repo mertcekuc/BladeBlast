@@ -1,0 +1,9 @@
+res://default_env.tres
+res://scenes/Menu.tscn
+res://scenes/Enemy.tscn
+res://scenes/EXP.tscn
+res://scenes/MONEY.tscn
+res://scenes/Npc.tscn
+res://scenes/SpawnHandler.tscn
+res://scenes/Sounds.tscn
+res://scenes/Weapons/Arrow.tscn

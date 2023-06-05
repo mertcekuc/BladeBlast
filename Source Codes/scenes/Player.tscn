@@ -1,0 +1,424 @@
+[gd_scene load_steps=27 format=2]
+
+[ext_resource path="res://textures/player/char_10.png" type="Texture2D" id=1]
+[ext_resource path="res://scenes/PlayerKinematicBody.gd" type="Script" id=2]
+[ext_resource path="res://scenes/Player.gd" type="Script" id=3]
+[ext_resource path="res://textures/pngkit_vignette-png-1920x1080_1451734.png" type="Texture2D" id=4]
+[ext_resource path="res://Font.tres" type="FontFile" id=5]
+[ext_resource path="res://scenes/Weapons/Whip.tscn" type="PackedScene" id=6]
+[ext_resource path="res://textures/atlas/upgrade2atlas.tres" type="Texture2D" id=7]
+[ext_resource path="res://textures/blank.png" type="Texture2D" id=8]
+[ext_resource path="res://textures/blank2.png" type="Texture2D" id=9]
+[ext_resource path="res://scenes/UpgradeHandler.gd" type="Script" id=10]
+[ext_resource path="res://scenes/ItemHandler.gd" type="Script" id=11]
+[ext_resource path="res://scenes/Weapons/Wand.tscn" type="PackedScene" id=12]
+[ext_resource path="res://scenes/Weapons/Bow.tscn" type="PackedScene" id=13]
+[ext_resource path="res://textures/atlas/upgrade0atlas.tres" type="Texture2D" id=14]
+[ext_resource path="res://textures/atlas/upgrade1atlas.tres" type="Texture2D" id=15]
+[ext_resource path="res://sfx/gameover.wav" type="AudioStream" id=16]
+
+[sub_resource type="Animation" id=2]
+resource_name = "Idle"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/path = NodePath("Player/Sprite2D:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PackedFloat32Array( 0 ),
+"transitions": PackedFloat32Array( 1 ),
+"update": 0,
+"values": [ 0.0 ]
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "Walk"
+length = 0.75
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Player/Sprite2D:rotation_degrees")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PackedFloat32Array( 0.35, 0.75 ),
+"transitions": PackedFloat32Array( 1, 1 ),
+"update": 0,
+"values": [ 15.0, -15.0 ]
+}
+
+[sub_resource type="AnimationNodeAnimation" id=6]
+animation = "Idle"
+
+[sub_resource type="AnimationNodeAnimation" id=7]
+animation = "Walk"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=8]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=9]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachine" id=4]
+states/Idle/node = SubResource( 6 )
+states/Idle/position = Vector2( 369, 72 )
+states/Walk/node = SubResource( 7 )
+states/Walk/position = Vector2( 527, 63 )
+transitions = [ "Idle", "Walk", SubResource( 8 ), "Walk", "Idle", SubResource( 9 ) ]
+start_node = "Idle"
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id=5]
+
+[sub_resource type="CapsuleShape2D" id=13]
+radius = 24.0
+height = 16.0
+
+[sub_resource type="RectangleShape2D" id=11]
+size = Vector2( 32, 32 )
+
+[node name="Player" type="Node2D"]
+script = ExtResource( 3 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 10
+follow_viewport_enabled = true
+
+[node name="Player" type="CharacterBody2D" parent="."]
+script = ExtResource( 2 )
+
+[node name="Sword" parent="Player" instance=ExtResource( 6 )]
+
+[node name="Bow" parent="Player" instance=ExtResource( 13 )]
+
+[node name="Wand" parent="Player" instance=ExtResource( 12 )]
+
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
+position = Vector2( 1.43051e-06, 1.43051e-06 )
+scale = Vector2( 4, 4 )
+texture = ExtResource( 1 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Player"]
+root_node = NodePath("../..")
+autoplay = "Idle"
+anims/Idle = SubResource( 2 )
+anims/Walk = SubResource( 3 )
+
+[node name="AnimationTree" type="AnimationTree" parent="Player"]
+tree_root = SubResource( 4 )
+anim_player = NodePath("../AnimationPlayer")
+active = true
+parameters/playback = SubResource( 5 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource( 13 )
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+current = true
+
+[node name="ui" type="Control" parent="Player/Camera2D"]
+offset_left = -640.0
+offset_top = -360.0
+offset_right = 640.0
+offset_bottom = 360.0
+
+[node name="vignette" type="TextureRect" parent="Player/Camera2D/ui"]
+modulate = Color( 1, 1, 1, 0.756863 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource( 4 )
+expand = true
+
+[node name="HealthLabel" type="Label" parent="Player/Camera2D/ui"]
+offset_left = 24.0
+offset_top = 64.0
+offset_right = 141.0
+offset_bottom = 112.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "Health:"
+
+[node name="SpeedLabel" type="Label" parent="Player/Camera2D/ui"]
+offset_left = 24.0
+offset_top = 104.0
+offset_right = 141.0
+offset_bottom = 152.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "Speed:"
+
+[node name="RangeLabel" type="Label" parent="Player/Camera2D/ui"]
+offset_left = 24.0
+offset_top = 144.0
+offset_right = 141.0
+offset_bottom = 192.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "Range:"
+
+[node name="Health" type="Label" parent="Player/Camera2D/ui"]
+offset_left = 184.0
+offset_top = 64.0
+offset_right = 301.0
+offset_bottom = 112.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "0"
+
+[node name="Speed" type="Label" parent="Player/Camera2D/ui"]
+offset_left = 184.0
+offset_top = 104.0
+offset_right = 301.0
+offset_bottom = 152.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "0"
+
+[node name="Range" type="Label" parent="Player/Camera2D/ui"]
+offset_left = 184.0
+offset_top = 144.0
+offset_right = 301.0
+offset_bottom = 192.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "0"
+
+[node name="ui2" type="Control" parent="Player/Camera2D"]
+offset_left = -640.0
+offset_top = -360.0
+offset_right = 640.0
+offset_bottom = 360.0
+
+[node name="Level" type="Label" parent="Player/Camera2D/ui2"]
+offset_right = 1280.0
+offset_bottom = 72.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "Level:"
+align = 1
+
+[node name="Time" type="Label" parent="Player/Camera2D/ui2"]
+offset_left = 1056.0
+offset_top = 68.0
+offset_right = 1264.0
+offset_bottom = 104.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "Time: 00:00"
+align = 1
+
+[node name="Money" type="Label" parent="Player/Camera2D/ui2"]
+offset_left = 256.0
+offset_top = 72.0
+offset_right = 1024.0
+offset_bottom = 108.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "Gold:"
+align = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="Player/Camera2D/ui2"]
+offset_left = 16.0
+offset_top = 32.0
+offset_right = 1264.0
+offset_bottom = 56.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+max_value = 1000.0
+rounded = true
+
+[node name="ui3" type="Control" parent="Player/Camera2D"]
+offset_left = -640.0
+offset_top = -360.0
+offset_right = 640.0
+offset_bottom = 360.0
+
+[node name="ItemHandler" type="Node" parent="Player/Camera2D/ui3"]
+script = ExtResource( 11 )
+
+[node name="ui4" type="Control" parent="Player/Camera2D"]
+process_mode = 2
+visible = false
+offset_left = -640.0
+offset_top = -360.0
+offset_right = 640.0
+offset_bottom = 360.0
+
+[node name="UpgradeHandler" type="Node" parent="Player/Camera2D/ui4"]
+script = ExtResource( 10 )
+
+[node name="Upgrade1" type="Control" parent="Player/Camera2D/ui4"]
+offset_left = -240.0
+offset_top = 16.0
+offset_right = -200.0
+offset_bottom = 56.0
+
+[node name="ColorRect" type="ColorRect" parent="Player/Camera2D/ui4/Upgrade1"]
+offset_left = 240.0
+offset_top = -16.0
+offset_right = 1520.0
+offset_bottom = 704.0
+color = Color( 1, 1, 1, 0.180392 )
+
+[node name="Upgrade" type="TextureButton" parent="Player/Camera2D/ui4/Upgrade1"]
+modulate = Color( 0.376471, 0.376471, 0.376471, 1 )
+offset_left = 496.0
+offset_top = 176.0
+offset_right = 784.0
+offset_bottom = 544.0
+texture_normal = ExtResource( 8 )
+texture_hover = ExtResource( 9 )
+expand = true
+
+[node name="UpgradeLabel" type="Label" parent="Player/Camera2D/ui4/Upgrade1"]
+offset_left = 512.0
+offset_top = 200.0
+offset_right = 768.0
+offset_bottom = 236.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "Upgrade Name"
+align = 1
+autowrap = true
+
+[node name="UpgradeDescription" type="Label" parent="Player/Camera2D/ui4/Upgrade1"]
+offset_left = 512.0
+offset_top = 392.0
+offset_right = 768.0
+offset_bottom = 528.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "Description"
+align = 1
+autowrap = true
+
+[node name="UpgradeTexture" type="TextureRect" parent="Player/Camera2D/ui4/Upgrade1"]
+offset_left = 576.0
+offset_top = 248.0
+offset_right = 704.0
+offset_bottom = 376.0
+mouse_filter = 2
+texture = ExtResource( 14 )
+expand = true
+
+[node name="Upgrade2" type="Control" parent="Player/Camera2D/ui4"]
+offset_left = 96.0
+offset_top = 16.0
+offset_right = 136.0
+offset_bottom = 56.0
+
+[node name="Upgrade" type="TextureButton" parent="Player/Camera2D/ui4/Upgrade2"]
+modulate = Color( 0.376471, 0.376471, 0.376471, 1 )
+offset_left = 496.0
+offset_top = 176.0
+offset_right = 784.0
+offset_bottom = 544.0
+texture_normal = ExtResource( 8 )
+texture_hover = ExtResource( 9 )
+expand = true
+
+[node name="UpgradeLabel" type="Label" parent="Player/Camera2D/ui4/Upgrade2"]
+offset_left = 512.0
+offset_top = 200.0
+offset_right = 768.0
+offset_bottom = 236.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "Upgrade Name"
+align = 1
+autowrap = true
+
+[node name="UpgradeDescription" type="Label" parent="Player/Camera2D/ui4/Upgrade2"]
+offset_left = 512.0
+offset_top = 392.0
+offset_right = 768.0
+offset_bottom = 528.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "Description"
+align = 1
+autowrap = true
+
+[node name="UpgradeTexture" type="TextureRect" parent="Player/Camera2D/ui4/Upgrade2"]
+offset_left = 576.0
+offset_top = 248.0
+offset_right = 704.0
+offset_bottom = 376.0
+mouse_filter = 2
+texture = ExtResource( 15 )
+expand = true
+
+[node name="Upgrade3" type="Control" parent="Player/Camera2D/ui4"]
+offset_left = 432.0
+offset_top = 16.0
+offset_right = 472.0
+offset_bottom = 56.0
+
+[node name="Upgrade" type="TextureButton" parent="Player/Camera2D/ui4/Upgrade3"]
+modulate = Color( 0.376471, 0.376471, 0.376471, 1 )
+offset_left = 496.0
+offset_top = 176.0
+offset_right = 784.0
+offset_bottom = 544.0
+texture_normal = ExtResource( 8 )
+texture_hover = ExtResource( 9 )
+expand = true
+
+[node name="UpgradeLabel" type="Label" parent="Player/Camera2D/ui4/Upgrade3"]
+offset_left = 512.0
+offset_top = 200.0
+offset_right = 768.0
+offset_bottom = 236.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "Upgrade Name"
+align = 1
+autowrap = true
+
+[node name="UpgradeDescription" type="Label" parent="Player/Camera2D/ui4/Upgrade3"]
+offset_left = 512.0
+offset_top = 392.0
+offset_right = 768.0
+offset_bottom = 528.0
+theme_override_colors/font_color = Color( 1, 0.921569, 0.298039, 1 )
+theme_override_fonts/font = ExtResource( 5 )
+text = "Description"
+align = 1
+autowrap = true
+
+[node name="UpgradeTexture" type="TextureRect" parent="Player/Camera2D/ui4/Upgrade3"]
+offset_left = 576.0
+offset_top = 248.0
+offset_right = 704.0
+offset_bottom = 376.0
+mouse_filter = 2
+texture = ExtResource( 7 )
+expand = true
+
+[node name="Collectexp" type="Area2D" parent="Player"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player/Collectexp"]
+shape = SubResource( 11 )
+
+[node name="Collectmoney" type="Area2D" parent="Player"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player/Collectmoney"]
+shape = SubResource( 11 )
+
+[node name="Timer" type="Timer" parent="."]
+
+[node name="level up" type="AudioStreamPlayer" parent="."]
+process_mode = 2
+stream = ExtResource( 16 )
+
+[connection signal="levelup" from="." to="Player/Camera2D/ui4/UpgradeHandler" method="_on_Player_levelup"]
+[connection signal="bow" from="Player/Camera2D/ui3/ItemHandler" to="Player/Bow" method="_on_ItemHandler_bow"]
+[connection signal="sword" from="Player/Camera2D/ui3/ItemHandler" to="Player/Sword" method="_on_ItemHandler_sword"]
+[connection signal="wand" from="Player/Camera2D/ui3/ItemHandler" to="Player/Wand" method="_on_ItemHandler_wand"]
+[connection signal="add_item" from="Player/Camera2D/ui4/UpgradeHandler" to="Player/Camera2D/ui3/ItemHandler" method="_on_UpgradeHandler_add_item"]
+[connection signal="pressed" from="Player/Camera2D/ui4/Upgrade1/Upgrade" to="Player/Camera2D/ui4/UpgradeHandler" method="_on_Upgrade_pressed"]
+[connection signal="pressed" from="Player/Camera2D/ui4/Upgrade2/Upgrade" to="Player/Camera2D/ui4/UpgradeHandler" method="_on_Upgrade2_pressed"]
+[connection signal="pressed" from="Player/Camera2D/ui4/Upgrade3/Upgrade" to="Player/Camera2D/ui4/UpgradeHandler" method="_on_Upgrade3_pressed"]
+[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]

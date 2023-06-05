@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://bw2xfgh4ri2kr"]
+
+[ext_resource type="AudioStream" uid="uid://chlervr01hvod" path="res://sfx/attack.wav" id="1"]
+[ext_resource type="Script" path="res://Sounds.gd" id="2"]
+[ext_resource type="AudioStream" uid="uid://bbxe0vf6448lw" path="res://sfx/pickup.wav" id="3"]
+
+[node name="Sounds" type="Node"]
+script = ExtResource("2")
+
+[node name="die" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("1")
+volume_db = -4.37
+
+[node name="pickup" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3")
+volume_db = -5.244

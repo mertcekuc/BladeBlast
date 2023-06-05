@@ -1,0 +1,307 @@
+[gd_scene load_steps=22 format=3 uid="uid://dc2282sh6tfv3"]
+
+[ext_resource type="Texture2D" uid="uid://diusljqsfhh1m" path="res://textures/player/char_30.png" id="1"]
+[ext_resource type="Script" path="res://scenes/Npc.gd" id="2"]
+[ext_resource type="FontFile" path="res://Font.tres" id="3"]
+[ext_resource type="Script" path="res://scenes/NpcBody.gd" id="4"]
+[ext_resource type="Texture2D" uid="uid://bcv6frf1lnykk" path="res://textures/blank2.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://bdeytxiykvofy" path="res://textures/ui/#1 - Transparent Icons.png" id="7"]
+[ext_resource type="Texture2D" uid="uid://bohsipju0a04d" path="res://textures/blank.png" id="8"]
+[ext_resource type="Script" path="res://scenes/NPCUpgradeHandler.gd" id="9"]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(32, 32)
+
+[sub_resource type="RectangleShape2D" id="2"]
+size = Vector2(80, 80)
+
+[sub_resource type="Animation" id="3"]
+resource_name = "Idle"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="4"]
+resource_name = "Walk"
+length = 0.75
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:rotation_degrees")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.35, 0.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [15.0, -15.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_b1i01"]
+_data = {
+"Idle": SubResource("3"),
+"Walk": SubResource("4")
+}
+
+[sub_resource type="AnimationNodeAnimation" id="7"]
+animation = &"Idle"
+
+[sub_resource type="AnimationNodeAnimation" id="8"]
+animation = &"Walk"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="9"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="10"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachine" id="5"]
+states/Idle/node = SubResource("7")
+states/Idle/position = Vector2(307, 55)
+states/Walk/node = SubResource("8")
+states/Walk/position = Vector2(487, 55)
+transitions = ["Idle", "Walk", SubResource("9"), "Walk", "Idle", SubResource("10")]
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id="6"]
+
+[sub_resource type="CircleShape2D" id="12"]
+radius = 112.285
+
+[sub_resource type="AtlasTexture" id="11"]
+atlas = ExtResource("7")
+region = Rect2(355, 356, 26, 25)
+
+[node name="Npc" type="Node2D"]
+script = ExtResource("2")
+
+[node name="Npc" type="CharacterBody2D" parent="."]
+script = ExtResource("4")
+
+[node name="Dialog" type="Label" parent="Npc"]
+offset_left = -192.0
+offset_top = -80.0
+offset_right = 192.0
+offset_bottom = -44.0
+theme_override_colors/font_color = Color(1, 0.921569, 0.298039, 1)
+theme_override_fonts/font = ExtResource("3")
+text = "Kill 50 Goblins to Recruit"
+
+[node name="Sprite2D" type="Sprite2D" parent="Npc"]
+z_index = -5
+position = Vector2(1.43051e-06, 1.43051e-06)
+scale = Vector2(4, 4)
+texture = ExtResource("1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Npc"]
+shape = SubResource("1")
+disabled = true
+
+[node name="Recruit" type="Area2D" parent="Npc"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Npc/Recruit"]
+shape = SubResource("2")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Npc"]
+libraries = {
+"": SubResource("AnimationLibrary_b1i01")
+}
+
+[node name="AnimationTree" type="AnimationTree" parent="Npc"]
+tree_root = SubResource("5")
+anim_player = NodePath("../AnimationPlayer")
+active = true
+parameters/playback = SubResource("6")
+
+[node name="Collectexp" type="Area2D" parent="Npc"]
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Npc/Collectexp"]
+shape = SubResource("12")
+disabled = true
+
+[node name="Collectmoney" type="Area2D" parent="Npc"]
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Npc/Collectmoney"]
+shape = SubResource("12")
+disabled = true
+
+[node name="NPCUpgradeHandler" type="Node" parent="Npc"]
+process_mode = 2
+script = ExtResource("9")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ui4" type="Control" parent="CanvasLayer"]
+process_mode = 2
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/ui4"]
+layout_mode = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+color = Color(1, 1, 1, 0.180392)
+
+[node name="Upgrade1" type="Control" parent="CanvasLayer/ui4"]
+anchors_preset = 0
+offset_left = -240.0
+offset_top = 16.0
+offset_right = -200.0
+offset_bottom = 56.0
+
+[node name="Upgrade" type="TextureButton" parent="CanvasLayer/ui4/Upgrade1"]
+modulate = Color(0.376471, 0.376471, 0.376471, 1)
+layout_mode = 0
+offset_left = 496.0
+offset_top = 176.0
+offset_right = 784.0
+offset_bottom = 544.0
+texture_normal = ExtResource("8")
+texture_hover = ExtResource("6")
+
+[node name="UpgradeLabel" type="Label" parent="CanvasLayer/ui4/Upgrade1"]
+layout_mode = 0
+offset_left = 512.0
+offset_top = 200.0
+offset_right = 768.0
+offset_bottom = 236.0
+theme_override_colors/font_color = Color(1, 0.921569, 0.298039, 1)
+theme_override_fonts/font = ExtResource("3")
+text = "Upgrade Name"
+
+[node name="UpgradeDescription" type="Label" parent="CanvasLayer/ui4/Upgrade1"]
+layout_mode = 0
+offset_left = 512.0
+offset_top = 392.0
+offset_right = 768.0
+offset_bottom = 528.0
+theme_override_colors/font_color = Color(1, 0.921569, 0.298039, 1)
+theme_override_fonts/font = ExtResource("3")
+text = "Description"
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/ui4/Upgrade1"]
+layout_mode = 0
+offset_left = 576.0
+offset_top = 248.0
+offset_right = 704.0
+offset_bottom = 376.0
+mouse_filter = 2
+texture = SubResource("11")
+expand_mode = 1
+
+[node name="Upgrade2" type="Control" parent="CanvasLayer/ui4"]
+anchors_preset = 0
+offset_left = 96.0
+offset_top = 16.0
+offset_right = 136.0
+offset_bottom = 56.0
+
+[node name="Upgrade" type="TextureButton" parent="CanvasLayer/ui4/Upgrade2"]
+modulate = Color(0.376471, 0.376471, 0.376471, 1)
+layout_mode = 0
+offset_left = 496.0
+offset_top = 176.0
+offset_right = 784.0
+offset_bottom = 544.0
+texture_normal = ExtResource("8")
+texture_hover = ExtResource("6")
+
+[node name="UpgradeLabel" type="Label" parent="CanvasLayer/ui4/Upgrade2"]
+layout_mode = 0
+offset_left = 512.0
+offset_top = 200.0
+offset_right = 768.0
+offset_bottom = 236.0
+theme_override_colors/font_color = Color(1, 0.921569, 0.298039, 1)
+theme_override_fonts/font = ExtResource("3")
+text = "Upgrade Name"
+
+[node name="UpgradeDescription" type="Label" parent="CanvasLayer/ui4/Upgrade2"]
+layout_mode = 0
+offset_left = 512.0
+offset_top = 392.0
+offset_right = 768.0
+offset_bottom = 528.0
+theme_override_colors/font_color = Color(1, 0.921569, 0.298039, 1)
+theme_override_fonts/font = ExtResource("3")
+text = "Description"
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/ui4/Upgrade2"]
+layout_mode = 0
+offset_left = 576.0
+offset_top = 248.0
+offset_right = 704.0
+offset_bottom = 376.0
+mouse_filter = 2
+texture = SubResource("11")
+expand_mode = 1
+
+[node name="Upgrade3" type="Control" parent="CanvasLayer/ui4"]
+anchors_preset = 0
+offset_left = 432.0
+offset_top = 16.0
+offset_right = 472.0
+offset_bottom = 56.0
+
+[node name="Upgrade" type="TextureButton" parent="CanvasLayer/ui4/Upgrade3"]
+modulate = Color(0.376471, 0.376471, 0.376471, 1)
+layout_mode = 0
+offset_left = 496.0
+offset_top = 176.0
+offset_right = 784.0
+offset_bottom = 544.0
+texture_normal = ExtResource("8")
+texture_hover = ExtResource("6")
+
+[node name="UpgradeLabel" type="Label" parent="CanvasLayer/ui4/Upgrade3"]
+layout_mode = 0
+offset_left = 512.0
+offset_top = 200.0
+offset_right = 768.0
+offset_bottom = 236.0
+theme_override_colors/font_color = Color(1, 0.921569, 0.298039, 1)
+theme_override_fonts/font = ExtResource("3")
+text = "Upgrade Name"
+
+[node name="UpgradeDescription" type="Label" parent="CanvasLayer/ui4/Upgrade3"]
+layout_mode = 0
+offset_left = 512.0
+offset_top = 392.0
+offset_right = 768.0
+offset_bottom = 528.0
+theme_override_colors/font_color = Color(1, 0.921569, 0.298039, 1)
+theme_override_fonts/font = ExtResource("3")
+text = "Description"
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/ui4/Upgrade3"]
+layout_mode = 0
+offset_left = 576.0
+offset_top = 248.0
+offset_right = 704.0
+offset_bottom = 376.0
+mouse_filter = 2
+texture = SubResource("11")
+expand_mode = 1
+
+[connection signal="choice" from="." to="Npc/NPCUpgradeHandler" method="_on_Npc_choice"]
+[connection signal="body_entered" from="Npc/Recruit" to="." method="_on_Area2D_body_entered"]
+[connection signal="body_exited" from="Npc/Recruit" to="." method="_on_Area2D_body_exited"]
+[connection signal="NPC_Collect_Exp" from="Npc/NPCUpgradeHandler" to="." method="_on_NPCUpgradeHandler_NPC_Collect_Exp"]
+[connection signal="NPC_Collect_Gold" from="Npc/NPCUpgradeHandler" to="." method="_on_NPCUpgradeHandler_NPC_Collect_Gold"]
+[connection signal="pressed" from="CanvasLayer/ui4/Upgrade1/Upgrade" to="Npc/NPCUpgradeHandler" method="_on_Upgrade_pressed"]
+[connection signal="pressed" from="CanvasLayer/ui4/Upgrade2/Upgrade" to="Npc/NPCUpgradeHandler" method="_on_Upgrade2_pressed"]
+[connection signal="pressed" from="CanvasLayer/ui4/Upgrade3/Upgrade" to="Npc/NPCUpgradeHandler" method="_on_Upgrade3_pressed"]
